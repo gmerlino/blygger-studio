@@ -13,6 +13,11 @@ export interface Env {
   MOUNT?: string;
   /** TK generation (tk-core-plan.md §4): Anthropic Messages API key. Wrangler secret, per security-policy.md — never in code or .dev.vars committed to git. */
   AI_PROVIDER_KEY?: string;
+  /**
+   * Owner-API extension 1: bearer token for native clients (Blygger Desktop).
+   * Wrangler secret; unset = bearer auth disabled, cookie-only as upstream.
+   */
+  BLYG_OWNER_TOKEN?: string;
 }
 
 export interface ItemRow {
@@ -359,10 +364,13 @@ export const WEBMENTION_PATH = "webmention";
  * be: this is implementation identity, which the wire is indifferent to.
  */
 export const CLIENT = {
-  name: "blygger-studio",
-  version: "0.7.0",
+  // Fork of blygger-studio 0.7.0 carrying the Blygger Desktop owner-API
+  // extensions (src/owner-api.ts). Renamed as the upstream README asks, so the
+  // ecosystem census stays truthful.
+  name: "blygger-studio-desktop-ext",
+  version: "0.7.0-ext.1",
   /** Canonical source, for the manifest's `generator_url` (§16.6a, decision #34). */
-  url: "https://github.com/blygger/blygger-studio",
+  url: "https://github.com/gmerlino/blygger-studio",
 } as const;
 
 /**
