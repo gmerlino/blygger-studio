@@ -56,3 +56,19 @@ export async function verifySession(env: Env, cookieHeader: string | undefined):
   const expected = await hmacHex(env.COOKIE_SECRET, expiryStr);
   return timingSafeEqualStr(sig, expected);
 }
+
+/**
+ * Owner-API extension 1 (Blygger Desktop docs/SERVER.md): `Authorization:
+ * Bearer <token>` is accepted wherever the owner session cookie is, for /api
+ * only, and only when the Worker secret BLYG_OWNER_TOKEN is set. Unset or
+ * empty means bearer auth is off entirely — the upstream cookie-only
+ * behaviour. A native app cannot hold a studio cookie cleanly; the studio
+ * pages themselves stay cookie-only.
+ */
+export async function verifyBearer(env: Env, authHeader: string | undefined): Promise<boolean> {
+  const token = env.BLYG_OWNER_TOKEN;
+  if (!token || !authHeader) return false;
+  const match = authHeader.match(/^Bearer\s+(\S+)\s*$/i);
+  if (!match) return false;
+  return timingSafeEqualStr(token, match[1]);
+}

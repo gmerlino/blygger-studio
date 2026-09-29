@@ -13,6 +13,8 @@ export default defineConfig({
             TEST_MIGRATIONS: migrations,
             OWNER_PASSWORD: "test-password",
             COOKIE_SECRET: "test-cookie-secret",
+            // Owner-API extension 1 (bearer auth for native clients).
+            BLYG_OWNER_TOKEN: "test-owner-token",
             // Pin the default mount explicitly (matches wrangler.jsonc vars);
             // mount.test.ts exercises other mounts via makeApp() directly.
             MOUNT: "/blyg",
