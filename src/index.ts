@@ -21,7 +21,7 @@
 
 import { type Context, Hono } from "hono";
 import { api } from "./api.ts";
-import { verifySession } from "./auth.ts";
+import { verifyBearer, verifySession } from "./auth.ts";
 import { importerApi } from "./importer/api.ts";
 import { buildBlogrollOpml } from "./importer/opml.ts";
 import { publicHopperPage } from "./importer/pages.ts";
@@ -34,6 +34,7 @@ import { buildArchiveIndex, buildFeedXml, buildItemJson, buildManifest, buildPin
 import { mentionFetch } from "./mentions/http.ts";
 import { receiveMention, verifyMention } from "./mentions/receive.ts";
 import { mentionsApi } from "./mentions/api.ts";
+import { ownerApi } from "./owner-api.ts";
 import { drainOutbound } from "./mentions/send.ts";
 import { pruneFailedInbound } from "./mentions/store.ts";
 import { mentionsStudio } from "./mentions/studio.ts";
@@ -69,7 +70,10 @@ export function makeApp(mount: string) {
   app.route(studioBase, mentionsStudio);
 
   app.use("/api/*", async (c, next) => {
-    if (!(await verifySession(c.env, c.req.header("cookie")))) {
+    if (
+      !(await verifySession(c.env, c.req.header("cookie"))) &&
+      !(await verifyBearer(c.env, c.req.header("authorization")))
+    ) {
       return c.json({ error: "unauthorized" }, 401);
     }
     return next();
@@ -77,6 +81,7 @@ export function makeApp(mount: string) {
   app.route("/api", api);
   app.route("/api", importerApi);
   app.route("/api", mentionsApi);
+  app.route("/api", ownerApi);
 
   // --- Public surface: mount-relative — cache 60s; JSON/XML get permissive CORS. ---
 
